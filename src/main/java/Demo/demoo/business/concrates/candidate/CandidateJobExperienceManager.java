@@ -29,8 +29,8 @@ public class CandidateJobExperienceManager implements IJobExperience {
         jobExperience.setQuitWork(createCandidateJobExperienceRequest.getQuitWork());
         jobExperience.setStartingWork(createCandidateJobExperienceRequest.getStartingWork());
         jobExperience.setWorkplaceName(createCandidateJobExperienceRequest.getWorkplaceName());
-        if (jobExperience.getPosition().isEmpty() && jobExperience.getWorkplaceName().isEmpty()
-                && jobExperience.getQuitWork().isEmpty() && jobExperience.getStartingWork().isEmpty()){
+        if (jobExperience.getPosition() == null && jobExperience.getWorkplaceName() == null
+                && jobExperience.getQuitWork() == null && jobExperience.getStartingWork() == null){
             jobExperience.setWorkplaceName("İş deneyimi yok");
             jobExperience.setPosition("İş deneyimi yok");
             jobExperience.setStartingWork("İş deneyimi yok");

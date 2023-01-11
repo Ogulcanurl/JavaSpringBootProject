@@ -1,10 +1,8 @@
 package Demo.demoo.business.concrates.candidate;
 
 import Demo.demoo.business.abstracts.candidate.ISchoolInfo;
-import Demo.demoo.core.utitilies.results.DataResult;
-import Demo.demoo.core.utitilies.results.Result;
-import Demo.demoo.core.utitilies.results.SuccessDataResult;
-import Demo.demoo.core.utitilies.results.SuccessResult;
+import Demo.demoo.business.validations.abstracts.IValidationRules;
+import Demo.demoo.core.utitilies.results.*;
 import Demo.demoo.dataAccess.candidate.CandidateDao;
 import Demo.demoo.dataAccess.candidate.CvInfoDao;
 import Demo.demoo.dataAccess.candidate.SchoolInfoDao;
@@ -25,22 +23,26 @@ public class CandidateSchoolInfoManager implements ISchoolInfo {
     CvInfoDao cvInfoDao;
 
     @Autowired
-    CandidateDao candidateDao;
-
+    IValidationRules iValidationRules;
     @Override
     public Result add(CreateSchoolInfoRequest createSchoolInfoRequest) {
         SchoolInfo schoolInfo = new SchoolInfo();
         CandidateCvInfo candidateCvInfo = cvInfoDao.findById(createSchoolInfoRequest.getCvInfoId()).get();
-        schoolInfo.setSchoolName(createSchoolInfoRequest.getSchoolName());
-        schoolInfo.setGraduated(createSchoolInfoRequest.getGraduated());
-        if(schoolInfo.getGraduated().isEmpty()){
-            schoolInfo.setGraduated("devam ediyor");
+        if (iValidationRules.cannotBeEmptyWithSchool(createSchoolInfoRequest.getSchoolName(), createSchoolInfoRequest.getDepartment(), createSchoolInfoRequest.getYerOfEducation())) {
+            schoolInfo.setSchoolName(createSchoolInfoRequest.getSchoolName());
+            schoolInfo.setGraduated(createSchoolInfoRequest.getGraduated());
+            if (schoolInfo.getGraduated() == null) {
+                schoolInfo.setGraduated("devam ediyor");
+            }
+            schoolInfo.setDepartment(createSchoolInfoRequest.getDepartment());
+            schoolInfo.setYearOfEducation(createSchoolInfoRequest.getYerOfEducation());
+            candidateCvInfo.addSchool(schoolInfo);
+            cvInfoDao.save(candidateCvInfo);
+            return new SuccessResult("Deneme");
+        }if (!iValidationRules.cannotBeEmptyWithSchool(createSchoolInfoRequest.getSchoolName(), createSchoolInfoRequest.getDepartment(), createSchoolInfoRequest.getYerOfEducation())){
+            return new ErrorResult("Okul adı, Departman adı ve giriş tarihi boş geçilemez");
         }
-        schoolInfo.setDepartment(createSchoolInfoRequest.getDepartment());
-        schoolInfo.setYearOfEducation(createSchoolInfoRequest.getYerOfEducation());
-        candidateCvInfo.addSchool(schoolInfo);
-        cvInfoDao.save(candidateCvInfo);
-        return new SuccessResult("Deneme");
+        return new ErrorResult("beklenmedik bir hata oluştu");
     }
 
     @Override

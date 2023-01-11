@@ -142,6 +142,11 @@ public class ValidationRules implements IValidationRules {
     }
 
     @Override
+    public boolean cannotBeEmptyWithSchool(String schoolName, String department, String yearOfEducation) {
+        return !schoolName.trim().isEmpty() && !department.trim().isEmpty() && !yearOfEducation.trim().isEmpty();
+    }
+
+    @Override
     public boolean cannotBeEmptyWithSystemAdmin(String name, String lastName, String nationalId, String email, String password) {
         return !name.trim().isEmpty() && !lastName.trim().isEmpty() && !nationalId.trim().isEmpty()
                 && !email.trim().isEmpty() && !password.trim().isEmpty();

@@ -27,9 +27,9 @@ public class UserManager implements IUser {
     SystemAdminWithConfirmEmployersDao systemAdminWithConfirmEmployersDao;
     @Override
     public Result login(String email, String password) {
-        User user = userDao.getByEmail(email);
-        Employer employer = employerDao.getByUser_Email(email);
-        if (!iValidationRules.loginValidationWithEmployerEmail(email) && !iValidationRules.loginValidationWithEmployerPassword(password, user.getUserId())) {
+        User user = userDao.getByEmail(email.toLowerCase());
+        Employer employer = employerDao.getByUser_Email(email.toLowerCase());
+        if (!iValidationRules.loginValidationWithEmployerEmail(email.toLowerCase()) && !iValidationRules.loginValidationWithEmployerPassword(password, user.getUserId())) {
             if(employer != null){
                 SystemAdminWithConfirmEmployer systemAdminWithConfirmEmployer = systemAdminWithConfirmEmployersDao.findById(employer.getId()).get();
                 if (user.getUserId() == employer.getUser().getUserId()){
@@ -42,7 +42,7 @@ public class UserManager implements IUser {
             } else {
                 return new SuccessResult("Giriş başarılı");
             }
-        } else if (iValidationRules.loginValidationWithEmployerEmail(email) || iValidationRules.loginValidationWithEmployerPassword(password, user.getUserId())) {
+        } else if (iValidationRules.loginValidationWithEmployerEmail(email.toLowerCase()) || iValidationRules.loginValidationWithEmployerPassword(password, user.getUserId())) {
             return new ErrorResult("Şifrenizi veya Epostanızı kontrol edin.");
         }
         return new ErrorResult("Beklenemdik bir hata oluştu");

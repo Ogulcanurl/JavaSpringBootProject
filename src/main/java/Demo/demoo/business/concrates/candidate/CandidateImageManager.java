@@ -2,6 +2,7 @@ package Demo.demoo.business.concrates.candidate;
 
 import Demo.demoo.business.abstracts.candidate.ICandidateImage;
 import Demo.demoo.core.adapter.ICloudinary;
+import Demo.demoo.core.utitilies.StringConvertHelper;
 import Demo.demoo.core.utitilies.results.*;
 import Demo.demoo.dataAccess.candidate.CandidateDao;
 import Demo.demoo.dataAccess.candidate.CandidateImageDao;
@@ -29,18 +30,23 @@ public class CandidateImageManager implements ICandidateImage {
     @Autowired
     ICloudinary cloudinary;
 
-
     @Override
     public Result add(MultipartFile file, int candidateId, int cvId) {
         var result = this.cloudinary.upload(file);
+        CandidateImage candidateImage = new CandidateImage();
+        StringConvertHelper convertHelper = new StringConvertHelper();
         if (!result.isSuccess()) {
             return new ErrorResult(result.getMessage());
         }
-        CandidateImage candidateImage = new CandidateImage();
+        if(file == null){
+            candidateImage.setImage("Resim Yüklenmemiş");
+        }
         Candidate candidate = candidateDao.findById(candidateId).get();
         CandidateCvInfo candidateCvInfo = cvInfoDao.findById(cvId).get();
         candidateImage.setCandidate(candidate);
-        candidateImage.setImage(result.getData().get("url"));
+        String[] readList = {"pdf","txt","docx"};
+        String url = result.getData().get("url");
+        candidateImage.setImage(convertHelper.multiFileValidation(url, readList, "png"));
         candidateImageDao.save(candidateImage);
         candidateCvInfo.setCandidateImage(candidateImage);
         cvInfoDao.save(candidateCvInfo);

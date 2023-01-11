@@ -43,9 +43,4 @@ public class CandidateCvInfoManager implements ICandidateCvInfo {
         return new SuccessDataResult<>(cvInfoDao.findById(id).get());
     }
 
-    @Override
-    public DataResult<List<CandidateCvInfo>> getByJobExperienceAsc() {
-//        return new SuccessDataResult<>(cvInfoDao.getByJobExperience_StartingWorkAsc());
-        return null;
-    }
 }

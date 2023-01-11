@@ -2,6 +2,7 @@ package Demo.demoo.business.concrates.candidate;
 
 import Demo.demoo.business.abstracts.candidate.ICvUpload;
 import Demo.demoo.core.adapter.ICloudinary;
+import Demo.demoo.core.utitilies.StringConvertHelper;
 import Demo.demoo.core.utitilies.results.*;
 import Demo.demoo.dataAccess.candidate.CandidateDao;
 import Demo.demoo.dataAccess.candidate.CvUploadDao;
@@ -25,13 +26,16 @@ public class CvUploadManager implements ICvUpload {
     @Override
     public Result add(MultipartFile file, int candidateId) {
         var result = this.cloudinary.upload(file);
+        StringConvertHelper multiFile = new StringConvertHelper();
         if(!result.isSuccess()) {
             return new ErrorResult(result.getMessage());
         }
         CvUpload cvUpload = new CvUpload();
+        String url = result.getData().get("url");
+        String[] readList = {"text", "pdf", "docx"};
         Candidate candidate = candidateDao.findById(candidateId).get();
         cvUpload.setCandidateId(candidate);
-        cvUpload.setCvUrl(result.getData().get("url"));
+        cvUpload.setCvUrl(multiFile.multiFileValidation(url, readList, "png"));
         cvUploadDao.save(cvUpload);
         return new SuccessResult("Kayıt edildi");
     }

@@ -44,4 +44,6 @@ public interface IValidationRules {
 
      boolean loginValidationWithEmployerPassword(String password, int id);
 
+     boolean cannotBeEmptyWithSchool(String schoolName, String department, String yerOfEducation);
+
 }

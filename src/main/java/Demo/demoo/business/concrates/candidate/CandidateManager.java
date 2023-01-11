@@ -57,7 +57,7 @@ public class CandidateManager implements ICandidate {
                 candidate.setLastName(createCandidateRequest.getLastName());
                 candidate.setNationalId(createCandidateRequest.getNationalId());
                 candidate.setYearOfBirth(createCandidateRequest.getYearOfBirth());
-                user.setEmail(createCandidateRequest.getEmail());
+                user.setEmail(createCandidateRequest.getEmail().toLowerCase());
                 user.setPassword(createCandidateRequest.getPassword());
                 userDao.save(user);
                 candidate.setUser(user);

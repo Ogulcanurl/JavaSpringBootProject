@@ -13,5 +13,4 @@ public interface ICandidateCvInfo {
     DataResult<List<CandidateCvInfo>> getAll();
     DataResult<CandidateCvInfo> getById(int id);
 
-    DataResult<List<CandidateCvInfo>> getByJobExperienceAsc();
 }
