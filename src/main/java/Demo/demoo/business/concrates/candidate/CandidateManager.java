@@ -15,8 +15,10 @@ import Demo.demoo.entities.dtos.requests.CreateCandidateRequest;
 import Demo.demoo.entities.dtos.responses.GetAllCandidateResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,58 +36,61 @@ public class CandidateManager implements ICandidate {
     IMernisChek iMernisChek;
     @Override
     public Result add(CreateCandidateRequest createCandidateRequest) {
-
-        if (validationRules.isThereSuchRecordWithEmail(createCandidateRequest.getEmail())
-                && validationRules.isThereSuchRecordWithNationalId(createCandidateRequest.getNationalId())
-                && validationRules.isEmailValid(createCandidateRequest.getEmail())
-                && validationRules.isPasswordCheck(createCandidateRequest.getPassword())
-                && validationRules.isSizeValidationWithCandidate(createCandidateRequest.getNationalId(),
-                createCandidateRequest.getYearOfBirth())
-                && validationRules.cannotBeEmptyWithCandidate(createCandidateRequest.getNationalId()
-                , createCandidateRequest.getYearOfBirth()
-                , createCandidateRequest.getEmail(), createCandidateRequest.getName(), createCandidateRequest.getLastName()
-                , createCandidateRequest.getPassword())
-                && validationRules.isRepeatPasswordWithPassword(createCandidateRequest.getPassword(),
-                createCandidateRequest.getRepeatPassword())
-                && validationRules.isSizeValidationWithCandidate(createCandidateRequest.getNationalId()
-                , createCandidateRequest.getYearOfBirth())
-                && iMernisChek.isRealPerson(createCandidateRequest.getNationalId())) {
-            if(iEmailVerification.sendEmail(createCandidateRequest.getEmail())){
-                Candidate candidate = new Candidate();
-                User user = new User();
-                candidate.setName(createCandidateRequest.getName());
-                candidate.setLastName(createCandidateRequest.getLastName());
-                candidate.setNationalId(createCandidateRequest.getNationalId());
-                candidate.setYearOfBirth(createCandidateRequest.getYearOfBirth());
-                user.setEmail(createCandidateRequest.getEmail().toLowerCase());
-                user.setPassword(createCandidateRequest.getPassword());
-                userDao.save(user);
-                candidate.setUser(user);
-                return new SuccessDataResult<>(candidateDao.save(candidate), "Kayıt başarılı");
+        try{
+            if (validationRules.isThereSuchRecordWithEmail(createCandidateRequest.getEmail())
+                    && validationRules.isThereSuchRecordWithNationalId(createCandidateRequest.getNationalId())
+                    && validationRules.isEmailValid(createCandidateRequest.getEmail())
+                    && validationRules.isPasswordCheck(createCandidateRequest.getPassword())
+                    && validationRules.isSizeValidationWithCandidate(createCandidateRequest.getNationalId(),
+                    createCandidateRequest.getYearOfBirth())
+                    && validationRules.cannotBeEmptyWithCandidate(createCandidateRequest.getNationalId()
+                    , createCandidateRequest.getYearOfBirth()
+                    , createCandidateRequest.getEmail(), createCandidateRequest.getName(), createCandidateRequest.getLastName()
+                    , createCandidateRequest.getPassword())
+                    && validationRules.isRepeatPasswordWithPassword(createCandidateRequest.getPassword(),
+                    createCandidateRequest.getRepeatPassword())
+                    && validationRules.isSizeValidationWithCandidate(createCandidateRequest.getNationalId()
+                    , createCandidateRequest.getYearOfBirth())
+                    && iMernisChek.isRealPerson(createCandidateRequest.getNationalId())) {
+                if(iEmailVerification.sendEmail(createCandidateRequest.getEmail())){
+                    Candidate candidate = new Candidate();
+                    User user = new User();
+                    candidate.setName(createCandidateRequest.getName());
+                    candidate.setLastName(createCandidateRequest.getLastName());
+                    candidate.setNationalId(createCandidateRequest.getNationalId());
+                    candidate.setYearOfBirth(createCandidateRequest.getYearOfBirth());
+                    user.setEmail(createCandidateRequest.getEmail().toLowerCase());
+                    user.setPassword(createCandidateRequest.getPassword());
+                    userDao.save(user);
+                    candidate.setUser(user);
+                    return new SuccessDataResult<>(candidateDao.save(candidate));
+                }
+            } else if (!validationRules.isThereSuchRecordWithNationalId(createCandidateRequest.getNationalId())) {
+                return new ErrorResult("ERR_CANDIDATE_01");
+            } else if (!validationRules.isThereSuchRecordWithEmail(createCandidateRequest.getEmail())) {
+                return new ErrorResult("ERR_CANDIDATE_02");
+            } else if (!validationRules.isSizeValidationWithCandidate(createCandidateRequest.getNationalId(), createCandidateRequest.getYearOfBirth())) {
+                return new ErrorResult("ERR_CANDIDATE_03");
+            } else if (!validationRules.isRepeatPasswordWithPassword(createCandidateRequest.getPassword(), createCandidateRequest.getRepeatPassword())) {
+                return new ErrorResult("ERR_CANDIDATE_04");
+            } else if (!validationRules.isPasswordCheck(createCandidateRequest.getPassword())) {
+                return new ErrorResult("ERR_CANDIDATE_05");
+            } else if (!validationRules.cannotBeEmptyWithCandidate(createCandidateRequest.getNationalId()
+                    , createCandidateRequest.getYearOfBirth()
+                    , createCandidateRequest.getEmail(), createCandidateRequest.getName(), createCandidateRequest.getLastName()
+                    , createCandidateRequest.getPassword())) {
+                return new ErrorResult("ERR_CANDIDATE_06");
+            } else if (!iMernisChek.isRealPerson(createCandidateRequest.getNationalId())) {
+                return new ErrorResult("ERR_CANDIDATE_07");
+            } else if (!validationRules.isEmailValid(createCandidateRequest.getEmail())) {
+                return new ErrorResult("ERR_CANDIDATE_08");
+            } else if (!iEmailVerification.sendEmail(createCandidateRequest.getEmail())) {
+                return new ErrorResult("ERR_CANDIDATE_09");
             }
-        } else if (!validationRules.isThereSuchRecordWithNationalId(createCandidateRequest.getNationalId())) {
-            return new ErrorResult("Kimlik numarası zaten kayıtlı");
-        } else if (!validationRules.isThereSuchRecordWithEmail(createCandidateRequest.getEmail())) {
-            return new ErrorResult("E-mail zaten kayıtlı");
-        } else if (!validationRules.isSizeValidationWithCandidate(createCandidateRequest.getNationalId(), createCandidateRequest.getYearOfBirth())) {
-            return new ErrorResult("Girdiğiniz kimlik numarası veya Doğum yılıo yanlış.");
-        } else if (!validationRules.isRepeatPasswordWithPassword(createCandidateRequest.getPassword(), createCandidateRequest.getRepeatPassword())) {
-            return new ErrorResult("Şifre tekrarı yanlış.");
-        } else if (!validationRules.isPasswordCheck(createCandidateRequest.getPassword())) {
-            return new ErrorResult("Lütfen Geçerli Şifre Giriniz.");
-        } else if (!validationRules.cannotBeEmptyWithCandidate(createCandidateRequest.getNationalId()
-                , createCandidateRequest.getYearOfBirth()
-                , createCandidateRequest.getEmail(), createCandidateRequest.getName(), createCandidateRequest.getLastName()
-                , createCandidateRequest.getPassword())) {
-            return new ErrorResult("hiçbir alan boş geçilemez");
-        } else if (!iMernisChek.isRealPerson(createCandidateRequest.getNationalId())) {
-            return new ErrorResult("Kimlik numarası doğru değil");
-        } else if (!validationRules.isEmailValid(createCandidateRequest.getEmail())) {
-            return new ErrorResult("Geçerli bir E-mail giriniz");
-        } else if (!iEmailVerification.sendEmail(createCandidateRequest.getEmail())) {
-            return new ErrorResult("doğrulama kodu gönderilemedi.");
+        }catch (MethodArgumentTypeMismatchException | NoSuchElementException | NullPointerException e){
+            return new ErrorResult();
         }
-        return new ErrorResult("ups");
+        return new ErrorResult("ERR_CANDIDATE_00");
     }
 
     @Override

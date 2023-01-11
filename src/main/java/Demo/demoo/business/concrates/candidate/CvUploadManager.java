@@ -10,9 +10,11 @@ import Demo.demoo.entities.Candidate;
 import Demo.demoo.entities.candidate.CvUpload;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class CvUploadManager implements ICvUpload {
@@ -25,19 +27,23 @@ public class CvUploadManager implements ICvUpload {
 
     @Override
     public Result add(MultipartFile file, int candidateId) {
-        var result = this.cloudinary.upload(file);
-        StringConvertHelper multiFile = new StringConvertHelper();
-        if(!result.isSuccess()) {
-            return new ErrorResult(result.getMessage());
+        try {
+            var result = this.cloudinary.upload(file);
+            StringConvertHelper multiFile = new StringConvertHelper();
+            if(!result.isSuccess()) {
+                return new ErrorResult(result.getMessage());
+            }
+            CvUpload cvUpload = new CvUpload();
+            String url = result.getData().get("url");
+            String[] readList = {"text", "pdf", "docx"};
+            Candidate candidate = candidateDao.findById(candidateId).get();
+            cvUpload.setCandidateId(candidate);
+            cvUpload.setCvUrl(multiFile.multiFileValidation(url, readList, "png"));
+            cvUploadDao.save(cvUpload);
+            return new SuccessResult();
+        }catch (MethodArgumentTypeMismatchException | NoSuchElementException | NullPointerException e){
+            return new ErrorResult();
         }
-        CvUpload cvUpload = new CvUpload();
-        String url = result.getData().get("url");
-        String[] readList = {"text", "pdf", "docx"};
-        Candidate candidate = candidateDao.findById(candidateId).get();
-        cvUpload.setCandidateId(candidate);
-        cvUpload.setCvUrl(multiFile.multiFileValidation(url, readList, "png"));
-        cvUploadDao.save(cvUpload);
-        return new SuccessResult("Kayıt edildi");
     }
 
     @Override

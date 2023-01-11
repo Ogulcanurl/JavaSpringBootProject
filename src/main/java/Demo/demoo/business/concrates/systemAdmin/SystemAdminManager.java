@@ -11,8 +11,10 @@ import Demo.demoo.entities.dtos.requests.CreateSystemAdminRequest;
 import Demo.demoo.entities.dtos.responses.GetAllSystemAdminResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,42 +26,45 @@ public class SystemAdminManager implements ISystemAdmin {
     SystemAdminDao systemAdminDao;
     @Autowired
     UserDao userDao;
-    // Validation kuralları eklenecek.
-    // SystemAdmin Emloyerı nasıl ontrol edecek düşün.
+
     @Override
     public Result add(CreateSystemAdminRequest createSystemAdminRequest) {
-        if (iValidationRules.isEmailValid(createSystemAdminRequest.getEmail())
-                && iValidationRules.isPasswordCheck(createSystemAdminRequest.getPassword())
-                && iValidationRules.isThereSuchRecordWithEmail(createSystemAdminRequest.getEmail())
-                && iValidationRules.isThereSuchRecordWithNationalId(createSystemAdminRequest.getNationalId())
-                && iValidationRules.cannotBeEmptyWithSystemAdmin(createSystemAdminRequest.getName(), createSystemAdminRequest.getLastName(),
-                createSystemAdminRequest.getNationalId(), createSystemAdminRequest.getEmail(), createSystemAdminRequest.getPassword())){
 
-            SystemAdmin systemAdmin = new SystemAdmin();
-            User user = new User();
-            systemAdmin.setLastName(createSystemAdminRequest.getLastName());
-            systemAdmin.setName(createSystemAdminRequest.getName());
-            systemAdmin.setNationalId(createSystemAdminRequest.getNationalId());
-            user.setEmail(createSystemAdminRequest.getEmail());
-            user.setPassword(createSystemAdminRequest.getPassword());
-            userDao.save(user);
-            systemAdmin.setUser(user);
-            systemAdminDao.save(systemAdmin);
-            return new SuccessResult("Kayıt başarılı");
-        } else if (!iValidationRules.isEmailValid(createSystemAdminRequest.getEmail())) {
-            return new ErrorResult("geçerli bir email giriniz");
-        } else if (!iValidationRules.isPasswordCheck(createSystemAdminRequest.getPassword())) {
-            return new ErrorResult("geçerli bir şifre giriniz");
-        } else if (!iValidationRules.isThereSuchRecordWithEmail(createSystemAdminRequest.getEmail())) {
-            return new ErrorResult("böyle bir email zaten var");
-        } else if (!iValidationRules.isThereSuchRecordWithNationalId(createSystemAdminRequest.getNationalId())) {
-            return new ErrorResult("böyle bir kimlik numarası zaten kayıtlı");
-        } else if (!iValidationRules.cannotBeEmptyWithSystemAdmin(createSystemAdminRequest.getName(), createSystemAdminRequest.getLastName(),
-                createSystemAdminRequest.getNationalId(), createSystemAdminRequest.getEmail(), createSystemAdminRequest.getPassword())) {
-            return new ErrorResult("hiçbir alan boş geçilemez");
+        try {
+            if (iValidationRules.isEmailValid(createSystemAdminRequest.getEmail())
+                    && iValidationRules.isPasswordCheck(createSystemAdminRequest.getPassword())
+                    && iValidationRules.isThereSuchRecordWithEmail(createSystemAdminRequest.getEmail())
+                    && iValidationRules.isThereSuchRecordWithNationalId(createSystemAdminRequest.getNationalId())
+                    && iValidationRules.cannotBeEmptyWithSystemAdmin(createSystemAdminRequest.getName(), createSystemAdminRequest.getLastName(),
+                    createSystemAdminRequest.getNationalId(), createSystemAdminRequest.getEmail(), createSystemAdminRequest.getPassword())){
+
+                SystemAdmin systemAdmin = new SystemAdmin();
+                User user = new User();
+                systemAdmin.setLastName(createSystemAdminRequest.getLastName());
+                systemAdmin.setName(createSystemAdminRequest.getName());
+                systemAdmin.setNationalId(createSystemAdminRequest.getNationalId());
+                user.setEmail(createSystemAdminRequest.getEmail());
+                user.setPassword(createSystemAdminRequest.getPassword());
+                userDao.save(user);
+                systemAdmin.setUser(user);
+                systemAdminDao.save(systemAdmin);
+                return new SuccessResult("Kayıt başarılı");
+            } else if (!iValidationRules.isEmailValid(createSystemAdminRequest.getEmail())) {
+                return new ErrorResult("ERR_SYSTEM_ADMIN_05");
+            } else if (!iValidationRules.isPasswordCheck(createSystemAdminRequest.getPassword())) {
+                return new ErrorResult("ERR_SYSTEM_ADMIN_02");
+            } else if (!iValidationRules.isThereSuchRecordWithEmail(createSystemAdminRequest.getEmail())) {
+                return new ErrorResult("ERR_SYSTEM_ADMIN_03");
+            } else if (!iValidationRules.isThereSuchRecordWithNationalId(createSystemAdminRequest.getNationalId())) {
+                return new ErrorResult("ERR_SYSTEM_ADMIN_04");
+            } else if (!iValidationRules.cannotBeEmptyWithSystemAdmin(createSystemAdminRequest.getName(), createSystemAdminRequest.getLastName(),
+                    createSystemAdminRequest.getNationalId(), createSystemAdminRequest.getEmail(), createSystemAdminRequest.getPassword())) {
+                return new ErrorResult("ERR_SYSTEM_ADMIN_01");
+            }
+            return new ErrorResult("ERR_SYSTEM_ADMIN_00");
+        }catch (MethodArgumentTypeMismatchException | NoSuchElementException | NullPointerException e){
+            return new ErrorResult();
         }
-
-        return new ErrorResult("ups");
     }
 
     @Override

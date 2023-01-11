@@ -46,4 +46,5 @@ public interface IValidationRules {
 
      boolean cannotBeEmptyWithSchool(String schoolName, String department, String yerOfEducation);
 
+
 }

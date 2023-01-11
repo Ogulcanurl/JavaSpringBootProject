@@ -9,8 +9,10 @@ import Demo.demoo.entities.dtos.requests.CreateCityRequest;
 import Demo.demoo.entities.dtos.responses.GetAllCityResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,14 +24,18 @@ public class CityManager implements ICity {
 
     @Override
     public Result add(CreateCityRequest createCityRequest) {
-        if (iValidationRules.isThereSuchRecordWithCity(createCityRequest.getCity())){
-            City city = new City();
-            city.setCity(createCityRequest.getCity());
-            return new SuccessDataResult<>(cityDao.save(city),"Şehir kaydedildi.");
-        }else if (!iValidationRules.isThereSuchRecordWithCity(createCityRequest.getCity())){
-            return new ErrorResult("Böyle bir şehir zaten kayıtlı");
+        try {
+            if (iValidationRules.isThereSuchRecordWithCity(createCityRequest.getCity())){
+                City city = new City();
+                city.setCity(createCityRequest.getCity());
+                return new SuccessDataResult<>(cityDao.save(city),"Şehir kaydedildi.");
+            }else if (!iValidationRules.isThereSuchRecordWithCity(createCityRequest.getCity())){
+                return new ErrorResult("ERR_CITY_01");
+            }
+            return new ErrorResult("ERR_CITY_00");
+        }catch (MethodArgumentTypeMismatchException | NoSuchElementException | NullPointerException e){
+            return new ErrorResult();
         }
-        return new ErrorResult("ups");
     }
 
     @Override

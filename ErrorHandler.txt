@@ -1,0 +1,53 @@
+ERR_CANDIDATE_CV_00 : Beklenmedik bir hata oluştu.
+ERR_CANDIDATE_CV_01 : Candidate'in cvsi var.
+ERR_CANDIDATE_CV_02 : Özgeçmiş boş geçilemez.
+ERR_CANDIDATE_CV_03 : Id alanı boş veya geçersiz .
+-----------------------------------------------------------------
+ERR_CANDIDATE_01 : Hiçbir alan boş geçilemez.
+ERR_CANDIDATE_02 : E-mail zaten kayıtlı.
+ERR_CANDIDATE_03 : Kimlik numarası veya doğum yılı yanlış.
+ERR_CANDIDATE_04 : Şifre tekrarı yanlış.
+ERR_CANDIDATE_05 : Geçerli şifre girin en az 8 karakter 1 büyük karakter 1 rakam.
+ERR_CANDIDATE_06 : Kimlik numarası zaten kayıtılı.
+ERR_CANDIDATE_07 : Kimlik nuamrası doğru değil.
+ERR_CANDIDATE_08 : Geçerli bir e mail giriniz.
+ERR_CANDIDATE_09 : Doğrulama kodu gönderilemedi.
+-----------------------------------------------------------------
+ERR_CANDIDATE_SCHOOL_INFO_00 : Beklenmedik bir hata oluştu.
+ERR_CANDIDATE_SCHOOL_INFO_01 : Okul adı, Departman adı ve giriş tarihi boş geçilemez.
+-----------------------------------------------------------------
+ERR_CITY_00 : Beklenmedik bir hata oluştu.
+ERR_CITY_01 : Böyle bir şehir zaten kayıtlı.
+-----------------------------------------------------------------
+ERR_JOB_ADVERTISEMENT_01 : Beklenmedik bir hata oluştu.
+ERR_JOB_ADVERTISEMENT_01 : Hiçbir alan boş geçilemez.
+ERR_JOB_ADVERTISEMENT_02 : Böyle bir ilan bulunamadı.
+-----------------------------------------------------------------
+ERR_JOB_TITTLE_00 : Beklenmedik bir hata oluştu.
+ERR_JOB_TITTLE_01 : İş pozisyonu boş geçilemez.
+ERR_JOB_TITTLE_02 : İş pozisyonu tekrar edemez.
+-----------------------------------------------------------------
+ERR_SYSTEM_ADMIN_00 : Beklenmedik bir hata oluştu.
+ERR_SYSTEM_ADMIN_01 : Hiçbir alan boş geçilemez.
+ERR_SYSTEM_ADMIN_02 : Geçerli şifre girin en az 8 karakter 1 büyük karakter 1 rakam.
+ERR_SYSTEM_ADMIN_03 : E mail zaten kayıtlı.
+ERR_SYSTEM_ADMIN_04 : Kimlik numarası zaten kayıtlı.
+ERR_SYSTEM_ADMIN_05 : Geçerli bir email giriniz.
+-----------------------------------------------------------------
+ERR_SYSTEM_ADMIN_CONFİRM_EMPLOYER_01 : Doğrulama gerçekleşemedi.
+-----------------------------------------------------------------
+ERR_USER_00 : Beklenmedik bir hata oluştu.
+ERR_USER_01 : Şifrenizi veya Epostanızı kontrol edin.
+ERR_USER_02 : Doğrulama bekleniyor.
+-----------------------------------------------------------------
+ERR_EMPLOYER_00 : Beklenmedik bir hata oluştu.
+ERR_EMPLOYER_01 : Email adresiniz web siteniz ile aynı değil.
+ERR_EMPLOYER_02 : Şifre tekarı yanlış.
+ERR_EMPLOYER_03 : Email zaten var.
+ERR_EMPLOYER_04 : Geçerli bir email giriniz.
+ERR_EMPLOYER_05 : Website zaten kayıtlı.
+ERR_EMPLOYER_06 : Böyle bir şirket adı zaten var.
+ERR_EMPLOYER_07 : Böyle bir telefon numarası zaten kayıtlı.
+ERR_EMPLOYER_08 : Şifrenizi doğru giriniz.
+ERR_EMPLOYER_09 : Telefon numaranız 11 haneli olmalıdır.
+ERR_EMPLOYER_10 : Hiçbir alan boş geçilemez.

@@ -13,6 +13,9 @@ import Demo.demoo.entities.systemAdmin.SystemAdminWithConfirmEmployer;
 import Demo.demoo.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import java.util.NoSuchElementException;
 
 @Service
 public class UserManager implements IUser {
@@ -27,24 +30,28 @@ public class UserManager implements IUser {
     SystemAdminWithConfirmEmployersDao systemAdminWithConfirmEmployersDao;
     @Override
     public Result login(String email, String password) {
-        User user = userDao.getByEmail(email.toLowerCase());
-        Employer employer = employerDao.getByUser_Email(email.toLowerCase());
-        if (!iValidationRules.loginValidationWithEmployerEmail(email.toLowerCase()) && !iValidationRules.loginValidationWithEmployerPassword(password, user.getUserId())) {
-            if(employer != null){
-                SystemAdminWithConfirmEmployer systemAdminWithConfirmEmployer = systemAdminWithConfirmEmployersDao.findById(employer.getId()).get();
-                if (user.getUserId() == employer.getUser().getUserId()){
-                    if(systemAdminWithConfirmEmployer.isApproval()){
-                        return new SuccessResult("Giriş Başarılı");
-                    }else{
-                        return new ErrorResult("Doğrulama bekleniyor.");
+        try {
+            User user = userDao.getByEmail(email.toLowerCase());
+            Employer employer = employerDao.getByUser_Email(email.toLowerCase());
+            if (!iValidationRules.loginValidationWithEmployerEmail(email.toLowerCase()) && !iValidationRules.loginValidationWithEmployerPassword(password, user.getUserId())) {
+                if(employer != null){
+                    SystemAdminWithConfirmEmployer systemAdminWithConfirmEmployer = systemAdminWithConfirmEmployersDao.findById(employer.getId()).get();
+                    if (user.getUserId() == employer.getUser().getUserId()){
+                        if(systemAdminWithConfirmEmployer.isApproval()){
+                            return new SuccessResult("Giriş Başarılı");
+                        }else{
+                            return new ErrorResult("ERR_USER_02");
+                        }
                     }
+                } else {
+                    return new SuccessResult("Giriş başarılı");
                 }
-            } else {
-                return new SuccessResult("Giriş başarılı");
+            } else if (iValidationRules.loginValidationWithEmployerEmail(email.toLowerCase()) || iValidationRules.loginValidationWithEmployerPassword(password, user.getUserId())) {
+                return new ErrorResult("ERR_USER_01");
             }
-        } else if (iValidationRules.loginValidationWithEmployerEmail(email.toLowerCase()) || iValidationRules.loginValidationWithEmployerPassword(password, user.getUserId())) {
-            return new ErrorResult("Şifrenizi veya Epostanızı kontrol edin.");
+            return new ErrorResult("Beklenemdik bir hata oluştu");
+        }catch (MethodArgumentTypeMismatchException | NoSuchElementException | NullPointerException e){
+            return new ErrorResult();
         }
-        return new ErrorResult("Beklenemdik bir hata oluştu");
     }
 }

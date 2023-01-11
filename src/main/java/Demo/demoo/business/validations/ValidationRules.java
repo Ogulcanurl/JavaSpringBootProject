@@ -3,6 +3,7 @@ package Demo.demoo.business.validations;
 import Demo.demoo.business.validations.abstracts.IValidationRules;
 import Demo.demoo.dataAccess.*;
 import Demo.demoo.dataAccess.candidate.CandidateDao;
+import Demo.demoo.dataAccess.candidate.CvInfoDao;
 import Demo.demoo.dataAccess.employer.CityDao;
 import Demo.demoo.dataAccess.employer.EmployerDao;
 import Demo.demoo.dataAccess.employer.JobTittleDao;
@@ -25,7 +26,6 @@ public class ValidationRules implements IValidationRules {
     JobTittleDao jobTittleDao;
     @Autowired
     CityDao cityDao;
-
     @Override
     public boolean isThereSuchRecordWithEmail(String email) {
         return candidateDao.getByUser_Email(email.toUpperCase().trim().toLowerCase()) == null;

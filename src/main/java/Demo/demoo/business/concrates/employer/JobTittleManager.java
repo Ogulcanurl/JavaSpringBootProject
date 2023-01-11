@@ -9,8 +9,10 @@ import Demo.demoo.entities.dtos.requests.CreateJobTittleRequest;
 import Demo.demoo.entities.dtos.responses.GetAllJobTittleResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,23 +25,27 @@ public class JobTittleManager implements IJobTittle {
 
     @Override
     public Result add(CreateJobTittleRequest createJobTittleRequest) {
-        if (iValidationRules.cannotBeEmptyWithJobTittle(createJobTittleRequest.getJobTittle())
-                && iValidationRules.isThereSuchRecordWithJobTittle(createJobTittleRequest.getJobTittle())){
-            JobTittle jobTittle = new JobTittle();
-            jobTittle.setJobTittle(createJobTittleRequest.getJobTittle());
-            jobTittle.setJobDescription(createJobTittleRequest.getDescription());
-            jobTittleDao.save(jobTittle);
-            return new SuccessResult("Eklendi");
-        } else if (!iValidationRules.cannotBeEmptyWithJobTittle(createJobTittleRequest.getJobTittle())) {
-            return new ErrorResult("Boş geçilemez");
-        } else if (!iValidationRules.isThereSuchRecordWithJobTittle(createJobTittleRequest.getJobTittle())) {
-            return new ErrorResult("İş pozisyonu tekrar edemez.");
+        try {
+            if (iValidationRules.cannotBeEmptyWithJobTittle(createJobTittleRequest.getJobTittle())
+                    && iValidationRules.isThereSuchRecordWithJobTittle(createJobTittleRequest.getJobTittle())){
+                JobTittle jobTittle = new JobTittle();
+                jobTittle.setJobTittle(createJobTittleRequest.getJobTittle());
+                jobTittle.setJobDescription(createJobTittleRequest.getDescription());
+                jobTittleDao.save(jobTittle);
+                return new SuccessResult();
+            } else if (!iValidationRules.cannotBeEmptyWithJobTittle(createJobTittleRequest.getJobTittle())) {
+                return new ErrorResult("ERR_JOB_TITTLE_01");
+            } else if (!iValidationRules.isThereSuchRecordWithJobTittle(createJobTittleRequest.getJobTittle())) {
+                return new ErrorResult("ERR_JOB_TITTLE_02");
+            }
+            return new ErrorResult("ERR_JOB_TITTLE_00");
+        } catch (MethodArgumentTypeMismatchException | NoSuchElementException | NullPointerException e){
+            return new ErrorResult();
         }
-        return new ErrorResult("ups");
     }
 
     @Override
     public DataResult<List<GetAllJobTittleResponse>> getall() {
-        return new SuccessDataResult<>(jobTittleDao.findAll().stream().map(GetAllJobTittleResponse :: new).collect(Collectors.toList()),"Data Listelendi");
+        return new SuccessDataResult<>(jobTittleDao.findAll().stream().map(GetAllJobTittleResponse::new).collect(Collectors.toList()), "Data Listelendi");
     }
 }

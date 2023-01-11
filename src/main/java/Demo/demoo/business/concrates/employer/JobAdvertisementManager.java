@@ -15,8 +15,10 @@ import Demo.demoo.entities.dtos.requests.CreateJobAdvertisement;
 import Demo.demoo.entities.dtos.responses.GetTableJobAdvertisementResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,25 +38,29 @@ public class JobAdvertisementManager implements IJobAdvertisement {
 
     @Override
     public Result add(CreateJobAdvertisement createJobAdvertisement) {
-        if (iValidationRules.cannotBeEmptyWithJobAdvertisement(createJobAdvertisement.getEmployerId(), createJobAdvertisement.getJobTittleId(), createJobAdvertisement.getJobDescription(), createJobAdvertisement.getCityId(), createJobAdvertisement.getMaxSalary(), createJobAdvertisement.getMinSalary(), createJobAdvertisement.getNumberOfOpenPosition(), createJobAdvertisement.getApplicationDeadLine())){
-            JobAdvertisement jobAdvertisement = new JobAdvertisement();
-            JobTittle jobTittle = jobTittleDao.findById(createJobAdvertisement.getJobTittleId()).get();
-            City city = cityDao.findById(createJobAdvertisement.getCityId()).get();
-            Employer employer = employerDao.findById(createJobAdvertisement.getEmployerId()).get();
-            jobAdvertisement.setCity(city);
-            jobAdvertisement.setJobDescription(createJobAdvertisement.getJobDescription());
-            jobAdvertisement.setJobTittle(jobTittle);
-            jobAdvertisement.setEmployer(employer);
-            jobAdvertisement.setApplicationDeadline(createJobAdvertisement.getApplicationDeadLine());
-            jobAdvertisement.setMaxSalary(createJobAdvertisement.getMaxSalary());
-            jobAdvertisement.setMinSalary(createJobAdvertisement.getMinSalary());
-            jobAdvertisement.setNumberOfOpenPosition(createJobAdvertisement.getNumberOfOpenPosition());
-            jobAdvertisement.setActivate(true);
-            return new SuccessDataResult<>(jobAdvertisementDao.save(jobAdvertisement),"a");
-        } else if (!iValidationRules.cannotBeEmptyWithJobAdvertisement(createJobAdvertisement.getEmployerId(), createJobAdvertisement.getJobTittleId(), createJobAdvertisement.getJobDescription(), createJobAdvertisement.getCityId(), createJobAdvertisement.getMaxSalary(), createJobAdvertisement.getMinSalary(), createJobAdvertisement.getNumberOfOpenPosition(), createJobAdvertisement.getApplicationDeadLine())) {
-            return new ErrorResult("Hiçbir alan boş geçilemez.");
-        }
-        return new ErrorResult("ups");
+       try {
+           if (iValidationRules.cannotBeEmptyWithJobAdvertisement(createJobAdvertisement.getEmployerId(), createJobAdvertisement.getJobTittleId(), createJobAdvertisement.getJobDescription(), createJobAdvertisement.getCityId(), createJobAdvertisement.getMaxSalary(), createJobAdvertisement.getMinSalary(), createJobAdvertisement.getNumberOfOpenPosition(), createJobAdvertisement.getApplicationDeadLine())){
+               JobAdvertisement jobAdvertisement = new JobAdvertisement();
+               JobTittle jobTittle = jobTittleDao.findById(createJobAdvertisement.getJobTittleId()).get();
+               City city = cityDao.findById(createJobAdvertisement.getCityId()).get();
+               Employer employer = employerDao.findById(createJobAdvertisement.getEmployerId()).get();
+               jobAdvertisement.setCity(city);
+               jobAdvertisement.setJobDescription(createJobAdvertisement.getJobDescription());
+               jobAdvertisement.setJobTittle(jobTittle);
+               jobAdvertisement.setEmployer(employer);
+               jobAdvertisement.setApplicationDeadline(createJobAdvertisement.getApplicationDeadLine());
+               jobAdvertisement.setMaxSalary(createJobAdvertisement.getMaxSalary());
+               jobAdvertisement.setMinSalary(createJobAdvertisement.getMinSalary());
+               jobAdvertisement.setNumberOfOpenPosition(createJobAdvertisement.getNumberOfOpenPosition());
+               jobAdvertisement.setActivate(true);
+               return new SuccessDataResult<>(jobAdvertisementDao.save(jobAdvertisement));
+           } else if (!iValidationRules.cannotBeEmptyWithJobAdvertisement(createJobAdvertisement.getEmployerId(), createJobAdvertisement.getJobTittleId(), createJobAdvertisement.getJobDescription(), createJobAdvertisement.getCityId(), createJobAdvertisement.getMaxSalary(), createJobAdvertisement.getMinSalary(), createJobAdvertisement.getNumberOfOpenPosition(), createJobAdvertisement.getApplicationDeadLine())) {
+               return new ErrorResult("ERR_JOB_ADVERTISEMENT_01");
+           }
+           return new ErrorResult("ERR_JOB_ADVERTISEMENT_00");
+       }catch (MethodArgumentTypeMismatchException | NoSuchElementException | NullPointerException e){
+           return new ErrorResult();
+       }
     }
 
     @Override
@@ -75,7 +81,7 @@ public class JobAdvertisementManager implements IJobAdvertisement {
             jobAdvertisementDao.save(jobAdvertisement);
             return new SuccessDataResult<>(jobAdvertisementDao.findAll().stream().map(GetTableJobAdvertisementResponse :: new).collect(Collectors.toList()), "İlan pasifleşti");
         }
-        return new ErrorDataResult<>(null,"Böyle bir ilanınız bulunamadı.");
+        return new ErrorDataResult<>(null,"ERR_JOB_ADVERTISEMENT_02");
     }
 
     @Override
