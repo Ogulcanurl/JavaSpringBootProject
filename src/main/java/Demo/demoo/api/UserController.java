@@ -14,6 +14,7 @@ public class UserController {
     @Autowired
     IUser user;
 
+
     @GetMapping("login")
     public Result login(String email, String password){
         return user.login(email, password);
